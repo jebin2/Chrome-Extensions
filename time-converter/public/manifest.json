@@ -1,12 +1,12 @@
 {
   "short_name": "Converter",
-  "name": "TimeZone Converter",
+  "name": "DateTime Converter",
   "version":"1.0.0",
-  "description": "To convert time from one timezone to another",
+  "description": "To convert datetime from one timezone to another",
   "manifest_version":3,
   "author": "Jebin Einstein E",
   "action":{
     "default_popup": "index.html",
-    "default_title": "TimeZone Converter"
+    "default_title": "DateTime Converter"
   }
 }
