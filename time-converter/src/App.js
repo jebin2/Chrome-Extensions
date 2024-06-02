@@ -160,7 +160,7 @@ function App() {
   return (
     <>
       <div className='mt-3 text-center' style={{ width: "600px" }}>
-			<h2>Time Converter</h2>
+			<h2>DateTime Converter</h2>
 			<div className='pA dIF'>
 				<Autocomplete
 					size="small"
