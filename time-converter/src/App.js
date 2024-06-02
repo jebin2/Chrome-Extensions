@@ -1,5 +1,5 @@
 import './App.css';
-import { TextField, InputLabel } from '@mui/material';
+import { TextField } from '@mui/material';
 import * as React from 'react';
 import timzonesJSON from './timezone.json'
 import dayjs from 'dayjs';
@@ -13,6 +13,7 @@ import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import Tooltip from '@mui/material/Tooltip';
+import Chip from '@mui/material/Chip';
 
 function App() {
 	const [fromTimezone, setFromTimezone] = React.useState(timzonesJSON[0]);
@@ -48,8 +49,8 @@ function App() {
 		backgroundColor: '#fff',
 		...theme.typography.body2,
 		padding: theme.spacing(1),
-		textAlign: 'center',
-		color: theme.palette.text.secondary,
+		textAlign: 'left',
+		color: theme.palette.text.secondary
 	}));
 	const handleFromChange = (event, newValue) => {
 		if(newValue) {
@@ -211,35 +212,36 @@ function App() {
 					error={isInvalidMinute}
 					onChange={handleMinuteChange} />
 			</div>
-			<Box sx={{ width: '100%', top: "25px", height: "300px", overflow: "auto"  }} size="small" className='pA'>
-				<Stack spacing={2}>
+			<Box sx={{ width: '100%', top: "25px", height: "200px", overflow: "auto" }} size="small" className='pA'>
+				<Stack>
 					{toTimeZoneListData.map(data => (
-						<Item>
+						<Item style={data.id === 1 ? { border: "1px solid black" } : {borderLeft: "1px solid black", borderBottom: "1px solid black", borderRight: "1px solid black"}}>
+							<div className='dIF cP' style={{ width: "60px" }}>
+								{data.id > 1 &&
+									<RemoveIcon
+										className='cP'
+										style={{top: "15px", left: "5px"}}
+										onClick={() => removeToTimeZone(data.id)}
+									/>
+								}
+								<AddIcon
+									className='cP'
+									style={{top: "15px", left: "5px"}}
+									onClick={() => addToTimeZone()}
+								/>
+							</div>
 							<Autocomplete
 							size="small"
-							disablePortal
 							autoHighlight
 							value={data.toTimezone.label}
 							id={data.id}
 							options={timzonesJSON}
-							sx={{ width: 300 }}
 							onChange={(e, newValue) => handleToChange(e, newValue, data.id)}
-							className="dIBImpl"
+							className="dIF"
+							sx={{ width: 300 }}
 							renderInput={(params) => <Tooltip title={params.inputProps.value} arrow><TextField {...params} /></Tooltip>}
 							/>
-							<AddIcon
-								className='dIBImpl pA cP'
-								style={{top: "15px", left: "5px"}}
-								onClick={() => addToTimeZone()}
-							/>
-							{data.id > 1 &&
-								<RemoveIcon
-									className='dIBImpl pA cP'
-									style={{top: "15px", left: "5px"}}
-									onClick={() => removeToTimeZone(data.id)}
-								/>
-							}
-							<InputLabel className='pL5 pR5 fWBImpl'>Result:: {data.result}</InputLabel>
+							<Chip style={{ marginLeft: "10px" }} label={data.result}></Chip>
 						</Item>
 					))}
 				</Stack>
