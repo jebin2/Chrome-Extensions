@@ -12,32 +12,40 @@ import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import Tooltip from '@mui/material/Tooltip';
 
 function App() {
-  const [fromTimezone, setFromTimezone] = React.useState(timzonesJSON[0]);
-	const [timeStamp, setTimeStamp] = React.useState();
-	const [date, setDate] = React.useState('');
+	const [fromTimezone, setFromTimezone] = React.useState(timzonesJSON[0]);
+	const convertTimeStampFromLocal = (millSec) => {
+		return millSec + (dayjs().utcOffset() * 60 * 1000);
+	}
+	dayjs.extend(utc);
+	dayjs.extend(timezone);
+	const [timeStamp, setTimeStamp] = React.useState(convertTimeStampFromLocal(+dayjs()));
+	const [date, setDate] = React.useState(dayjs(timeStamp).tz(fromTimezone.sys_value).format("YYYY-MM-DD"));
 	const [isInvalidDate, setIsInvalidDate] = React.useState(false);
-	const [hour, setHour] = React.useState('');
+	const [hour, setHour] = React.useState(dayjs(timeStamp).tz(fromTimezone.sys_value).format("HH"));
 	const [isInvalidHour, setIsInvalidHour] = React.useState(false);
-	const [minute, setMinute] = React.useState('');
+	const [minute, setMinute] = React.useState(dayjs(timeStamp).tz(fromTimezone.sys_value).format("mm"));
 	const [isInvalidMinute, setIsInvalidMinute] = React.useState(false);
+	const ist = timzonesJSON.filter(x => x.sys_value === "IST")[0];
+	const pst = timzonesJSON.filter(x => x.sys_value === "PST")[0];
 	const [toTimeZoneListData, setToTimeZoneListData] = React.useState([{
 		id: 1,
-		result: "",
+		result: dayjs("1970-01-01T00:00:00" + fromTimezone.offset, "YYYY-MM-DDTHH:mm:ssZ").add(timeStamp).tz(timzonesJSON[0].sys_value).format("YYYY-MM-DDTHH:mm:ssZ"),
 		toTimezone: timzonesJSON[0]
 	},{
 		id: 2,
-		result: "",
-		toTimezone: timzonesJSON.filter(x => x.sys_value === "IST")[0]
+		result: dayjs("1970-01-01T00:00:00" + fromTimezone.offset, "YYYY-MM-DDTHH:mm:ssZ").add(timeStamp).tz(ist.sys_value).format("YYYY-MM-DDTHH:mm:ssZ"),
+		toTimezone: ist
 	},{
 		id: 3,
-		result: "",
-		toTimezone: timzonesJSON.filter(x => x.sys_value === "PST")[0]
+		result: dayjs("1970-01-01T00:00:00" + fromTimezone.offset, "YYYY-MM-DDTHH:mm:ssZ").add(timeStamp).tz(pst.sys_value).format("YYYY-MM-DDTHH:mm:ssZ"),
+		toTimezone: pst
 	}]);
  
 	const Item = styled(Paper)(({ theme }) => ({
-		backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+		backgroundColor: '#fff',
 		...theme.typography.body2,
 		padding: theme.spacing(1),
 		textAlign: 'center',
@@ -97,15 +105,6 @@ function App() {
 		}
 	};
 	const handleHourChange = (event) => {
-		// if(+event.target.value < 0) {
-		// 	event.target.value = "00";
-		// }
-		// if(+event.target.value > 23) {
-		// 	event.target.value = "23";
-		// }
-		// if(event.target.value.length < 2) {
-		// 	event.target.value = "0"+event.target.value;
-		// }
 		setHour(event.target.value);
 		if(!event.target.value || event.target.value.length !== 2 || +event.target.value > 23 || +event.target.value < 0) {
 			setIsInvalidHour(true);
@@ -119,15 +118,6 @@ function App() {
 		}
 	};
 	const handleMinuteChange = (event) => {
-		// if(+event.target.value < 0) {
-		// 	event.target.value = "00";
-		// }
-		// if(+event.target.value > 59) {
-		// 	event.target.value = "59";
-		// }
-		// if(event.target.value.length < 2) {
-		// 	event.target.value = "0"+event.target.value;
-		// }
 		setMinute(event.target.value);
 		if(!event.target.value || event.target.value.length !== 2 || +event.target.value > 59 || +event.target.value < 0) {
 			setIsInvalidMinute(true);
@@ -167,14 +157,6 @@ function App() {
 			]);
 		}
 	}
-	const convertTimeStampFromLocal = (millSec) => {
-		return millSec + (dayjs().utcOffset() * 60 * 1000);
-	}
-	React.useEffect(() => {
-		let millSec = convertTimeStampFromLocal(+dayjs());
-		setTimeStamp(millSec);
-		calculate(undefined, millSec, true);
-	}, []);
   return (
     <>
       <div className='mt-3 text-center' style={{ width: "600px" }}>
@@ -189,7 +171,7 @@ function App() {
 					options={timzonesJSON}
 					sx={{ width: 300 }}
 					onChange={handleFromChange}
-					renderInput={(params) => <TextField {...params} label="Select From Timezone" />}
+					renderInput={(params) => <Tooltip title={params.inputProps.value} arrow><TextField {...params} label="Select From Timezone" /></Tooltip>}
 				/>
 			</div>
 			<div className='pA dIF' style={{ top: "15px" }}>
@@ -243,7 +225,7 @@ function App() {
 							sx={{ width: 300 }}
 							onChange={(e, newValue) => handleToChange(e, newValue, data.id)}
 							className="dIBImpl"
-							renderInput={(params) => <TextField {...params} label="Select To Timezone" />}
+							renderInput={(params) => <Tooltip title={params.inputProps.value} arrow><TextField {...params} /></Tooltip>}
 							/>
 							<AddIcon
 								className='dIBImpl pA cP'
